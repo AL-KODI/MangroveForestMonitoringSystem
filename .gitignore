@@ -1,0 +1,22 @@
+# ===== FRONTEND (React) =====
+frontend/ems_ui/node_modules/
+frontend/node_modules/
+frontend/ems_ui/build/
+frontend/ems_ui/dist/
+
+# React env files
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# ===== BACKEND (optional examples) =====
+
+
+# ===== COMMON =====
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.DS_Store
+.vscode/

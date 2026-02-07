@@ -1,0 +1,9 @@
+dotnet add package Microsoft.AspNetCore.Identity.EntityFrameworkCore --version 8.0.18
+dotnet add package Microsoft.AspNetCore.Identity.UI --version 8.0.16
+dotnet add package Microsoft.EntityFrameworkCore --version 8.0.18
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.18
+dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.18
+dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.18
+dotnet add package Microsoft.AspNetCore.SignalR --version 8.0.16
+dotnet add package Microsoft.AspNetCore.SignalR.Client.Core --version 8.0.18
+dotnet add package Microsoft.AspNetCore.Mvc.NewtonsoftJson --version 8.0.16

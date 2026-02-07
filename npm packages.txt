@@ -1,0 +1,4 @@
+npm install axios                 # HTTP requests to API
+npm install @microsoft/signalr    # SignalR client
+npm install chart.js react-chartjs-2 # Charts and plots
+npm install react-router-dom  
