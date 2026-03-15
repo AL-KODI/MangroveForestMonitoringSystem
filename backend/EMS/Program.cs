@@ -21,6 +21,7 @@ builder.Services.AddSignalR();
     });
 });
 */
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
@@ -32,13 +33,13 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 
 builder.Services.ConfigureApplicationCookie(opts => {
     opts.Cookie.HttpOnly = true;
-    opts.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    opts.Cookie.SecurePolicy = CookieSecurePolicy.None;
     opts.Cookie.SameSite = SameSiteMode.None; // allow cross-site cookie
 });
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
     options.Cookie.SameSite = SameSiteMode.None;
     options.LoginPath = "/User/Login";
 });
@@ -46,7 +47,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact",
         policy => policy
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins("http://localhost:3000", "http://192.168.43.183:3000", "http://192.168.137.96:3000","http://0.0.0.0:3000", "http://192.168.137.1:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
@@ -62,7 +63,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
