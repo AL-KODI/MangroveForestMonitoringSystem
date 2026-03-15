@@ -200,13 +200,29 @@ namespace EMS.Controllers
                     .Where(x => x.PropertyId == item.Key)
                     .Select(x => x.MinValue)
                     .FirstOrDefaultAsync();
-                if(item.Value >= max ||  item.Value <= min)
-                {
-                    var alert = "Annomally Detected at " + model.id + " Property = " + item.Key;
-                    Console.WriteLine(alert);
-                    await _hub.Clients.All.SendAsync("Alerts", alert);
-                }
+                if (item.Value >= max || item.Value <= min)
+{
+    var propertyName = await _context.Properties
+        .Where(x => x.PropertyId == item.Key)
+        .Select(x => x.PropertyName)
+        .FirstOrDefaultAsync();
 
+    var alertMessage = $"Anomaly detected at Unit {model.id} — {propertyName} value {item.Value} is out of range [{min}, {max}]";
+
+    var newAlert = new Alert
+    {
+        Message = alertMessage,
+        Type = "CRITICAL",
+        Source = $"Unit {model.id} - {propertyName}",
+        Timestamp = DateTime.UtcNow
+    };
+
+    _context.Alerts.Add(newAlert);
+    await _context.SaveChangesAsync();
+
+    Console.WriteLine(alertMessage);
+    await _hub.Clients.All.SendAsync("Alerts", alertMessage);
+}
 
             }
 
@@ -226,5 +242,99 @@ namespace EMS.Controllers
 
             return Ok();
         }
+        [Authorize]
+[HttpPost("getalerts")]
+public async Task<IActionResult> GetAlerts()
+{
+    var alerts = await _context.Alerts
+        .OrderByDescending(a => a.Timestamp)
+        .Take(50)
+        .Select(a => new AlertResponseDto
+        {
+            Message = a.Message,
+            Type = a.Type,
+            Source = a.Source,
+            Timestamp = a.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
+        })
+        .ToListAsync();
+
+    return Ok(alerts);
+}
+
+[Authorize]
+[HttpPost("getdashboardsummary")]
+public async Task<IActionResult> GetDashboardSummary()
+{
+    // Get all properties that exist in the database
+    var allProperties = await _context.Properties
+        .Where(p => p.PropertyName != null && p.PropertyName != "")
+        .ToListAsync();
+
+    var result = new List<DashboardSummaryDto>();
+
+    foreach (var property in allProperties)
+    {
+        // Get the latest measurement for this property across all units
+        var latest = await _context.Measurements
+            .Where(m => m.PropertyId == property.PropertyId)
+            .OrderByDescending(m => m.TimeStamp)
+            .Select(m => m.Value)
+            .FirstOrDefaultAsync();
+
+        result.Add(new DashboardSummaryDto
+        {
+            PropertyName = property.PropertyName,
+            Value = latest == 0 ? "--" : latest.ToString("F1"),
+            MeasuringUnit = property.MeasuringUnit
+        });
+    }
+
+    return Ok(result);
+}
+[Authorize]
+[HttpPost("getalldashboarddata")]
+public async Task<IActionResult> GetAllDashboardData()
+{
+    try
+    {
+        var measurements = await _context.Measurements.ToListAsync();
+        var unitProperties = await _context.UnitProperties.ToListAsync();
+        var units = await _context.Units.ToListAsync();
+        var properties = await _context.Properties
+            .Where(p => p.PropertyName != null && p.PropertyName != "")
+            .ToListAsync();
+
+        var result = new List<DashboardDataDto>();
+
+        foreach (var m in measurements)
+        {
+            var up = unitProperties.FirstOrDefault(x => x.UnitPropertyId == m.UnitPropertyId);
+            if (up == null) continue;
+
+            var unit = units.FirstOrDefault(x => x.UnitId == up.UnitId);
+            if (unit == null) continue;
+
+            var property = properties.FirstOrDefault(x => x.PropertyId == m.PropertyId);
+            if (property == null) continue;
+
+            result.Add(new DashboardDataDto
+            {
+                UnitId       = unit.UnitId,
+                UnitName     = unit.UnitName,
+                PropertyId   = property.PropertyId,
+                PropertyName = property.PropertyName,
+                Value        = m.Value,
+                Timestamp    = m.TimeStamp.ToString("yyyy-MM-dd HH:mm:ss")
+            });
+        }
+
+        return Ok(result.OrderByDescending(x => x.Timestamp).Take(500).ToList());
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error in GetAllDashboardData: " + ex.Message);
+        return StatusCode(500, new { error = ex.Message });
+    }
+}
     }
 }

@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 const API_BASE_URL = "http://localhost:5000";
-const METRICS = ["Temperature", "Humidity", "Air Quality Index", "CO2"];
 
 function Reports() {
     const [reportData, setReportData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [selectedMetric, setSelectedMetric] = useState("Temperature");
+    const [selectedMetric, setSelectedMetric] = useState(null);
+    const [metrics, setMetrics] = useState([]);
 
     useEffect(() => {
         loadReports();
@@ -23,12 +23,26 @@ function Reports() {
                 credentials: "include"
             });
 
-            if (!response.ok) {
-                throw new Error("Failed to load report data");
-            }
+            if (!response.ok) throw new Error("Failed to load report data");
 
             const data = await response.json();
-            setReportData(Array.isArray(data) ? data : []);
+            const arr = Array.isArray(data) ? data : [];
+            setReportData(arr);
+
+            // Build unique metric list from whatever properties exist in the data
+            const uniqueMetrics = [...new Set(
+                arr
+                    .map(item => item.propertyName)
+                    .filter(name => name && name.trim() !== "")
+            )];
+
+            setMetrics(uniqueMetrics);
+
+            // Auto select first metric
+            if (uniqueMetrics.length > 0) {
+                setSelectedMetric(uniqueMetrics[0]);
+            }
+
         } catch (error) {
             console.error("Error loading reports:", error);
             setError("Unable to load reports right now.");
@@ -39,25 +53,27 @@ function Reports() {
     }
 
     const filteredData = useMemo(() => {
+        if (!selectedMetric) return [];
         return reportData.filter(
-            (item) => item.propertyName?.trim() === selectedMetric
+            item => item.propertyName?.trim() === selectedMetric
         );
     }, [reportData, selectedMetric]);
 
     const summary = useMemo(() => {
         const values = filteredData
-            .map((item) => Number(item.value))
-            .filter((v) => !isNaN(v));
+            .map(item => Number(item.value))
+            .filter(v => !isNaN(v));
 
         if (values.length === 0) {
             return { min: "--", max: "--", avg: "--", count: 0 };
         }
 
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-        const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
-
-        return { min, max, avg, count: values.length };
+        return {
+            min: Math.min(...values),
+            max: Math.max(...values),
+            avg: (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2),
+            count: values.length
+        };
     }, [filteredData]);
 
     return (
@@ -75,18 +91,23 @@ function Reports() {
                         </p>
                     </div>
 
+                    {/* Dynamic metric pills — built from DB data */}
                     <div className="glass-card p-3 mb-4">
                         <div className="d-flex flex-wrap gap-2">
-                            {METRICS.map((metric) => (
-                                <button
-                                    key={metric}
-                                    type="button"
-                                    className={`metric-pill ${selectedMetric === metric ? "active" : ""}`}
-                                    onClick={() => setSelectedMetric(metric)}
-                                >
-                                    {metric}
-                                </button>
-                            ))}
+                            {metrics.length === 0 ? (
+                                <p className="glass-muted mb-0">No metrics found</p>
+                            ) : (
+                                metrics.map(metric => (
+                                    <button
+                                        key={metric}
+                                        type="button"
+                                        className={`metric-pill ${selectedMetric === metric ? "active" : ""}`}
+                                        onClick={() => setSelectedMetric(metric)}
+                                    >
+                                        {metric}
+                                    </button>
+                                ))
+                            )}
                         </div>
                     </div>
 
@@ -98,7 +119,6 @@ function Reports() {
                                 <h3 className="fw-bold mb-0">{summary.min}</h3>
                             </div>
                         </div>
-
                         <div className="col-sm-6 col-lg-3">
                             <div className="glass-card-soft h-100 p-3 glass-hover text-center">
                                 <div className="summary-icon mb-2">⬆️</div>
@@ -106,7 +126,6 @@ function Reports() {
                                 <h3 className="fw-bold mb-0">{summary.max}</h3>
                             </div>
                         </div>
-
                         <div className="col-sm-6 col-lg-3">
                             <div className="glass-card-soft h-100 p-3 glass-hover text-center">
                                 <div className="summary-icon mb-2">📊</div>
@@ -114,7 +133,6 @@ function Reports() {
                                 <h3 className="fw-bold mb-0">{summary.avg}</h3>
                             </div>
                         </div>
-
                         <div className="col-sm-6 col-lg-3">
                             <div className="glass-card-soft h-100 p-3 glass-hover text-center">
                                 <div className="summary-icon mb-2">🧾</div>
@@ -127,7 +145,9 @@ function Reports() {
                     <div className="glass-card p-4">
                         <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                             <div>
-                                <h5 className="fw-bold mb-1">{selectedMetric} Report</h5>
+                                <h5 className="fw-bold mb-1">
+                                    {selectedMetric || "Select a metric"} Report
+                                </h5>
                                 <p className="glass-muted small mb-0">
                                     Historical values collected from monitoring units
                                 </p>
@@ -171,7 +191,7 @@ function Reports() {
                                                     <td>{item.unitName || `Unit ${item.unitId}`}</td>
                                                     <td>{item.propertyName}</td>
                                                     <td className="fw-semibold">{item.value}</td>
-                                                    <td>{item.timestamp || item.createdAt || "--"}</td>
+                                                    <td>{item.timestamp || "--"}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

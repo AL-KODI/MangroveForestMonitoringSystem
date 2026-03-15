@@ -6,12 +6,7 @@ const API_BASE_URL = "http://localhost:5000";
 function Dashboard() {
   const [units, setUnits] = useState([]);
   const [alerts, setAlerts] = useState([]);
-  const [summary, setSummary] = useState({
-    temperature: "--",
-    humidity: "--",
-    co2: "--",
-    aqi: "--"
-  });
+  const [summary, setSummary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -43,27 +38,18 @@ function Dashboard() {
 
       const unitsData = unitsRes.ok ? await unitsRes.json() : [];
       const alertsData = alertsRes.ok ? await alertsRes.json() : [];
-      const summaryData = summaryRes.ok ? await summaryRes.json() : {};
+      const summaryData = summaryRes.ok ? await summaryRes.json() : [];
 
       setUnits(Array.isArray(unitsData) ? unitsData : []);
       setAlerts(Array.isArray(alertsData) ? alertsData : []);
-      setSummary({
-        temperature: summaryData?.temperature ?? "--",
-        humidity: summaryData?.humidity ?? "--",
-        co2: summaryData?.co2 ?? "--",
-        aqi: summaryData?.aqi ?? "--"
-      });
+      setSummary(Array.isArray(summaryData) ? summaryData : []);
+
     } catch (error) {
       console.error("Error loading dashboard:", error);
       setError("Unable to load dashboard data.");
       setUnits([]);
       setAlerts([]);
-      setSummary({
-        temperature: "--",
-        humidity: "--",
-        co2: "--",
-        aqi: "--"
-      });
+      setSummary([]);
     } finally {
       setLoading(false);
     }
@@ -83,6 +69,19 @@ function Dashboard() {
     if (type === "CRITICAL") return "🚨";
     if (type === "WARNING") return "⚠️";
     return "✅";
+  }
+
+  // Pick an emoji icon based on property name
+  function getPropertyIcon(name) {
+    const n = name?.toLowerCase() || "";
+    if (n.includes("temp")) return "🌡️";
+    if (n.includes("humid")) return "💧";
+    if (n.includes("co2") || n.includes("carbon")) return "🌫️";
+    if (n.includes("salt")) return "🧂";
+    if (n.includes("air")) return "💨";
+    if (n.includes("pressure")) return "🔵";
+    if (n.includes("light")) return "💡";
+    return "📟";
   }
 
   return (
@@ -113,7 +112,10 @@ function Dashboard() {
             </div>
           ) : (
             <>
+              {/* Dynamic Summary Cards — one per property */}
               <div className="row g-3 mb-4">
+
+                {/* Total Units card always shown first */}
                 <div className="col-sm-6 col-lg-3">
                   <div className="glass-card-soft h-100 p-3 glass-hover text-center">
                     <div className="summary-icon mb-2">📟</div>
@@ -122,29 +124,20 @@ function Dashboard() {
                   </div>
                 </div>
 
-                <div className="col-sm-6 col-lg-3">
-                  <div className="glass-card-soft h-100 p-3 glass-hover text-center">
-                    <div className="summary-icon mb-2">🌡️</div>
-                    <h6 className="glass-muted mb-1">Temperature</h6>
-                    <h2 className="fw-bold mb-0">{summary.temperature} °C</h2>
+                {/* One card per property from DB */}
+                {summary.map((item, index) => (
+                  <div className="col-sm-6 col-lg-3" key={index}>
+                    <div className="glass-card-soft h-100 p-3 glass-hover text-center">
+                      <div className="summary-icon mb-2">
+                        {getPropertyIcon(item.propertyName)}
+                      </div>
+                      <h6 className="glass-muted mb-1">{item.propertyName}</h6>
+                      <h2 className="fw-bold mb-0">
+                        {item.value} {item.value !== "--" ? item.measuringUnit : ""}
+                      </h2>
+                    </div>
                   </div>
-                </div>
-
-                <div className="col-sm-6 col-lg-3">
-                  <div className="glass-card-soft h-100 p-3 glass-hover text-center">
-                    <div className="summary-icon mb-2">💧</div>
-                    <h6 className="glass-muted mb-1">Humidity</h6>
-                    <h2 className="fw-bold mb-0">{summary.humidity} %</h2>
-                  </div>
-                </div>
-
-                <div className="col-sm-6 col-lg-3">
-                  <div className="glass-card-soft h-100 p-3 glass-hover text-center">
-                    <div className="summary-icon mb-2">🌫️</div>
-                    <h6 className="glass-muted mb-1">CO2 Level</h6>
-                    <h2 className="fw-bold mb-0">{summary.co2} ppm</h2>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className="row g-4">
@@ -182,7 +175,7 @@ function Dashboard() {
                               </div>
 
                               <p className="glass-muted mb-2">
-                                <span className="fw-semibold text-dark">Location:</span> {unit.location || "--"}
+                                <span className="fw-semibold">Location:</span> {unit.location || "--"}
                               </p>
 
                               <p className="glass-muted mb-3">
@@ -231,7 +224,6 @@ function Dashboard() {
                                   {alert.source || "System"} • {alert.timestamp || "--"}
                                 </small>
                               </div>
-
                               <span className={getAlertTypeClass(alert.type)}>
                                 {alert.type}
                               </span>

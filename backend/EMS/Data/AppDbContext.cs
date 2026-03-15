@@ -15,7 +15,7 @@
         }
         public DbSet<Unit> Units { get; set; }
         public DbSet<Property> Properties { get; set; }
-
+    public DbSet<Alert> Alerts { get; set; }
         public DbSet<UnitProperty> UnitProperties { get; set; }
         public DbSet<Measurement> Measurements { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

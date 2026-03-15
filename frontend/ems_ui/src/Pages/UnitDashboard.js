@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { connection } from "../signalr";
 import { Line } from "react-chartjs-2";
 import {
@@ -8,194 +7,212 @@ import {
   LineElement,
   CategoryScale,
   LinearScale,
-  PointElement
+  PointElement,
+  Legend,
+  Tooltip,
+  Title,
 } from "chart.js";
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
+ChartJS.register(
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Legend,
+  Tooltip,
+  Title
+);
 
-let propertyGraphColor = ["red", "green", "blue", "yellow", "purple", "cyan", "orange"];
-let properties = [];
+const API_BASE_URL = "http://localhost:5000";
+
+const COLORS = [
+  "rgba(255, 99, 132, 1)",
+  "rgba(54, 162, 235, 1)",
+  "rgba(255, 206, 86, 1)",
+  "rgba(75, 192, 192, 1)",
+  "rgba(153, 102, 255, 1)",
+  "rgba(255, 159, 64, 1)",
+  "rgba(0, 255, 200, 1)",
+  "rgba(255, 0, 150, 1)",
+];
+
+function buildGraphsPerProperty(measurements, unitProperties) {
+  // Returns an object: { [propertyId]: { chartData, propertyName } }
+  const result = {};
+
+  unitProperties.forEach((prop, index) => {
+    const pId = prop.propertyId;
+    const pMeasurements = measurements
+      .filter((m) => m.propertyId === pId)
+      .sort((a, b) => new Date(a.timeStamp) - new Date(b.timeStamp));
+
+    result[pId] = {
+      propertyName: prop.propertyName,
+      measuringUnit: prop.measuringUnit || "",
+      chartData: {
+        labels: pMeasurements.map((m) => {
+          const d = new Date(m.timeStamp);
+          return d.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
+        }),
+        datasets: [
+          {
+            label: prop.propertyName,
+            data: pMeasurements.map((m) => m.value),
+            borderColor: COLORS[index % COLORS.length],
+            backgroundColor: COLORS[index % COLORS.length].replace(
+              "1)",
+              "0.15)"
+            ),
+            tension: 0.3,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: "white",
+          },
+        ],
+      },
+    };
+  });
+
+  return result;
+}
 
 function UnitDashboard() {
   const { id } = useParams();
-  const [unitproperties, setUnitproperties] = useState([]);
-  const [propertydata, setPropertydata] = useState([]);
-  const [measurements, setMeasurements] = useState([]);
   const navigate = useNavigate();
+  const [unitProperties, setUnitProperties] = useState([]);
+  const [measurements, setMeasurements] = useState([]);
+  const [graphs, setGraphs] = useState({});
+  const [propertyData, setPropertyData] = useState([]);
   const [show, setShow] = useState(false);
-  const [firstTime, setfirstTime] = useState(true);
-  const [graphData, setGraphData] = useState({});
+  const [loading, setLoading] = useState(true);
 
+  // Load unit properties first, then measurements
   useEffect(() => {
-    fetch("http://localhost:5000/Data/getunitproperties", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        UnitId: id
-      })
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        setUnitproperties(data);
-        properties = data;
-        console.log("####");
-        console.log(properties);
-      });
+    async function loadData() {
+      setLoading(true);
 
-    const propertyIds = unitproperties.map(prop => prop.id);
-    fetch("http://localhost:5000/Data/getmeasurements", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ id, propertyIds })
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        setMeasurements(data);
+      // Step 1 — get properties for this unit
+      const propsRes = await fetch(
+        `${API_BASE_URL}/Data/getunitproperties`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ UnitId: id }),
+        }
+      );
+      const propsData = propsRes.ok ? await propsRes.json() : [];
+      setUnitProperties(propsData);
 
-        setGraphData(prev => {
-          const next = { ...prev };
+      // Step 2 — get measurements for this unit
+      const measRes = await fetch(
+        `${API_BASE_URL}/Data/getmeasurements`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: parseInt(id), propertyIds: [] }),
+        }
+      );
+      const measData = measRes.ok ? await measRes.json() : [];
+      setMeasurements(measData);
 
-          data.forEach(m => {
-            if (!next[m.propertyId]) {
-              next[m.propertyId] = {
-                labels: [],
-                datasets: [
-                  {
-                    data: [],
-                    borderColor: propertyGraphColor[m.propertyId],
-                    backgroundColor: "rgba(81, 201, 201, 0.2)"
-                  }
-                ]
-              };
-            }
+      // Step 3 — build graphs using both
+      setGraphs(buildGraphsPerProperty(measData, propsData));
+      setLoading(false);
+    }
 
-            const entry = next[m.propertyId];
+    loadData();
+  }, [id]);
 
-            if (entry.labels.includes(m.timeStamp)) return;
-
-            entry.labels.push(m.timeStamp);
-            entry.datasets[0].data.push(m.value);
-          });
-
-          return next;
-        });
-      });
-  }, []);
-
-  useEffect(() => {
-    console.log("graphData actually became:", graphData);
-  }, [graphData]);
-
+  // SignalR real-time updates
   useEffect(() => {
     if (connection.state === "Disconnected") {
-      connection.start()
-        .then(() => console.log("Connected to SignalR"))
-        .catch(err => console.error(err));
+      connection.start().catch((err) => console.error(err));
     }
-    console.log(connection.state);
 
-    connection.on("UpdateMeasurements", (data, UnitId) => {
-      console.log("Measurement Updates are Comming !!!");
-      if (id == UnitId) {
+    connection.on("UpdateMeasurements", (data, unitId) => {
+      if (parseInt(id) === parseInt(unitId)) {
         setMeasurements(data);
-        setGraphData(prev => {
-          const next = {};
-
-          data.forEach(m => {
-            if (!next[m.propertyId]) {
-              next[m.propertyId] = {
-                labels: [],
-                datasets: [{
-                  data: [],
-                  borderColor: propertyGraphColor[m.propertyId],
-                  borderColor: "cyan",
-                  backgroundColor: "rgba(0,255,255,0.2)",
-                  tension: 0.3,
-                  fill: true,
-                  pointBackgroundColor: "white",
-                  pointBorderColor: "cyan",
-                  pointRadius: 4
-                }]
-              };
-            }
-
-            const entry = next[m.propertyId];
-
-            if (entry.labels.includes(m.timeStamp)) return;
-
-            entry.labels.push(m.timeStamp);
-            entry.datasets[0].data.push(m.value);
-          });
-
-          return next;
+        setGraphs((prev) => {
+          // Rebuild graphs keeping current properties
+          return buildGraphsPerProperty(data, unitProperties);
         });
       }
     });
 
     return () => {
-      connection.off("ReceiveMessage");
+      connection.off("UpdateMeasurements");
     };
-  }, []);
+  }, [id, unitProperties]);
 
   function getProperties() {
     setShow(true);
-    fetch("http://localhost:5000/Data/getproperties", {
+    fetch(`${API_BASE_URL}/Data/getproperties`, {
       method: "POST",
-      credentials: "include"
+      credentials: "include",
     })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        setPropertydata(data);
-      });
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setPropertyData(data));
   }
 
-  function addProperty(PId) {
-    console.log("addProperty !!!");
-    fetch("http://localhost:5000/Data/addunitproperty", {
+  function addProperty(pId) {
+    fetch(`${API_BASE_URL}/Data/addunitproperty`, {
       method: "POST",
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        pid: PId,
-        uid: id
-      })
-    });
-
-    setShow(false);
-    window.location.reload();
-  }
-
-  function sendummydata() {
-    fetch("http://localhost:5000/Data/sendunitdata", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        id: id,
-        Vals: {
-          1: 50,
-          2: 65
-        },
-        TId: 220
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pid: pId, uid: parseInt(id) }),
+    }).then(() => {
+      setShow(false);
+      window.location.reload();
     });
   }
 
-  function findGraphTitle(pId) {
-    const prop = Object.values(unitproperties).find(p => p.propertyId === pId);
-    console.log(prop);
-    return prop?.propertyName;
+  function sendDummyData() {
+    const vals = {};
+    unitProperties.forEach((p) => {
+      vals[p.propertyId] = Math.random() * 100;
+    });
+
+    fetch(`${API_BASE_URL}/Data/sendunitdata`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: parseInt(id),
+        Vals: vals,
+        TId: Date.now(),
+      }),
+    });
   }
+
+  const chartOptions = (title, unit) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: "#111" } },
+      title: {
+        display: true,
+        text: `${title} ${unit ? `(${unit})` : ""}`,
+        color: "#111",
+      },
+    },
+    scales: {
+      x: {
+        ticks: { color: "#333", maxTicksLimit: 8 },
+        grid: { color: "rgba(0,0,0,0.07)" },
+      },
+      y: {
+        beginAtZero: false,
+        ticks: { color: "#333" },
+        grid: { color: "rgba(0,0,0,0.07)" },
+      },
+    },
+  });
 
   return (
     <div className="glass-page d-flex justify-content-center align-items-center min-vh-100 position-relative">
@@ -210,21 +227,21 @@ function UnitDashboard() {
               <div>
                 <h2 className="fw-bold mb-1">Unit Dashboard</h2>
                 <p className="glass-muted mb-0">
-                  Live monitoring data and property graphs for unit {id}
+                  Live monitoring data for unit {id}
                 </p>
               </div>
-
               <div className="d-flex gap-2 flex-wrap">
-                <button className="glass-btn" onClick={() => { sendummydata(); }}>
+                <button className="glass-btn" onClick={sendDummyData}>
                   Send Dummy Data
                 </button>
                 <button className="metric-pill" onClick={getProperties}>
-                  Add a New Property
+                  Add Property
                 </button>
               </div>
             </div>
           </div>
 
+          {/* Stats */}
           <div className="row g-3 mb-4">
             <div className="col-md-4">
               <div className="glass-stat-card p-4 text-center h-100 glass-hover">
@@ -233,100 +250,130 @@ function UnitDashboard() {
                 <h3 className="fw-bold mb-0">{id}</h3>
               </div>
             </div>
-
             <div className="col-md-4">
               <div className="glass-stat-card p-4 text-center h-100 glass-hover">
                 <div className="summary-icon mb-2">🧩</div>
                 <h6 className="glass-muted mb-1">Properties</h6>
-                <h3 className="fw-bold mb-0">{unitproperties?.length || 0}</h3>
+                <h3 className="fw-bold mb-0">{unitProperties.length}</h3>
               </div>
             </div>
-
             <div className="col-md-4">
               <div className="glass-stat-card p-4 text-center h-100 glass-hover">
                 <div className="summary-icon mb-2">📈</div>
                 <h6 className="glass-muted mb-1">Measurements</h6>
-                <h3 className="fw-bold mb-0">{measurements?.length || 0}</h3>
+                <h3 className="fw-bold mb-0">{measurements.length}</h3>
               </div>
             </div>
           </div>
 
-          <div className="row g-4">
-            <div className="col-lg-4">
-              <div className="glass-card p-4 h-100">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h5 className="fw-bold mb-0">Assigned Properties</h5>
-                  <span className="glass-badge">{unitproperties?.length || 0}</span>
-                </div>
-
-                {unitproperties?.length === 0 ? (
-                  <div className="glass-empty-box p-4 text-center">
-                    No properties found
+          {loading ? (
+            <div className="glass-card p-5 text-center">
+              <div className="spinner-border text-success"></div>
+              <p className="mt-3 glass-muted mb-0">Loading unit data...</p>
+            </div>
+          ) : (
+            <div className="row g-4">
+              {/* Properties List */}
+              <div className="col-lg-3">
+                <div className="glass-card p-4 h-100">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h5 className="fw-bold mb-0">Properties</h5>
+                    <span className="glass-badge">{unitProperties.length}</span>
                   </div>
-                ) : (
-                  <div className="d-flex flex-column gap-2">
-                    {unitproperties.map(unitproperty => (
-                      <div key={unitproperty.propertyId} className="glass-list-item">
-                        <div className="d-flex justify-content-between align-items-center">
-                          <div>
-                            <div className="fw-semibold">{unitproperty.propertyName}</div>
-                            <small className="glass-muted">Property ID: {unitproperty.propertyId}</small>
+
+                  {unitProperties.length === 0 ? (
+                    <div className="glass-empty-box p-4 text-center">
+                      <p className="glass-muted mb-0">No properties assigned</p>
+                    </div>
+                  ) : (
+                    <div className="d-flex flex-column gap-2">
+                      {unitProperties.map((prop) => {
+                        const latest = measurements
+                          .filter((m) => m.propertyId === prop.propertyId)
+                          .sort(
+                            (a, b) =>
+                              new Date(b.timeStamp) - new Date(a.timeStamp)
+                          )[0];
+
+                        return (
+                          <div
+                            key={prop.propertyId}
+                            className="glass-list-item"
+                          >
+                            <div className="fw-semibold">{prop.propertyName}</div>
+                            <small className="glass-muted">
+                              Latest:{" "}
+                              {latest
+                                ? `${latest.value} ${prop.measuringUnit || ""}`
+                                : "--"}
+                            </small>
                           </div>
-                          <span className="glass-badge">Assigned</span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Graphs — one per property */}
+              <div className="col-lg-9">
+                <div className="glass-card p-4">
+                  <h5 className="fw-bold mb-1">Property Graphs</h5>
+                  <p className="glass-muted small mb-4">
+                    Separate real-time chart for each property
+                  </p>
+
+                  {Object.keys(graphs).length === 0 ? (
+                    <div className="glass-empty-box p-4 text-center">
+                      <div className="fs-2 mb-2">📉</div>
+                      <h6 className="mb-1">No data yet</h6>
+                      <p className="glass-muted mb-0">
+                        Send some data to see graphs appear here.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="d-flex flex-column gap-4">
+                      {Object.entries(graphs).map(([pId, graph]) => (
+                        <div className="glass-chart-card p-3" key={pId}>
+                          <div className="d-flex justify-content-between align-items-center mb-3">
+                            <h6 className="fw-bold mb-0">{graph.propertyName}</h6>
+                            <span className="glass-badge">Live</span>
+                          </div>
+                          <div style={{ height: "260px" }}>
+                            {graph.chartData.datasets[0].data.length === 0 ? (
+                              <div className="glass-empty-box text-center py-4">
+                                <p className="glass-muted mb-0">
+                                  No measurements yet for {graph.propertyName}
+                                </p>
+                              </div>
+                            ) : (
+                              <Line
+                                data={graph.chartData}
+                                options={chartOptions(
+                                  graph.propertyName,
+                                  graph.measuringUnit
+                                )}
+                              />
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="col-lg-8">
-              <div className="glass-card p-4 h-100">
-                <h5 className="fw-bold mb-1">Property Graphs</h5>
-                <p className="glass-muted small mb-4">
-                  Real-time chart view for each connected property
-                </p>
-
-                {Object.keys(graphData || {}).length === 0 ? (
-                  <div className="glass-empty-box p-4 text-center">
-                    No graph data available
-                  </div>
-                ) : (
-                  <div className="d-flex flex-column gap-4">
-                    {Object.keys(graphData || {}).map(pId => (
-                      <div className="glass-chart-card p-3" key={pId}>
-                        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                          <h5 className="fw-bold mb-0">
-                            {unitproperties.map(unitproperty => (
-                              <span key={unitproperty.propertyId}>
-                                {unitproperty.propertyId == pId ? unitproperty.propertyName : ""}
-                              </span>
-                            ))}
-                          </h5>
-                          <span className="glass-badge">Live</span>
-                        </div>
-
-                        <div className="chart-box">
-                          <Line data={graphData[pId]} redraw={true}></Line>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
+          {/* Add Property Modal */}
           {show && (
             <div className="glass-modal-overlay">
               <div className="glass-modal-card">
                 <div className="glass-modal-header">
-                  <h5 className="mb-0">Add Property</h5>
+                  <h5 className="mb-0">Add Property to Unit</h5>
                 </div>
-
                 <div className="glass-modal-body">
-                  {propertydata.map(property => (
+                  {propertyData.map((property) => (
                     <div
                       key={property.propertyId}
                       className="glass-list-item glass-hover unit-card mb-2"
@@ -339,9 +386,11 @@ function UnitDashboard() {
                     </div>
                   ))}
                 </div>
-
                 <div className="glass-modal-footer text-end">
-                  <button className="metric-pill" onClick={() => setShow(false)}>
+                  <button
+                    className="metric-pill"
+                    onClick={() => setShow(false)}
+                  >
                     Close
                   </button>
                 </div>
