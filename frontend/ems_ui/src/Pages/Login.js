@@ -3,16 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Components/AuthContext";
 
 function LoginForm() {
- const { setUser } = useAuth();
+  const { setUser } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  
+
   const handleSubmit = async (e) => {
-    e.preventDefault(); // stop page reload
-    
+    e.preventDefault();
+
     const response = await fetch("http://localhost:5000/User/Login", {
       method: "POST",
       headers: {
@@ -21,68 +20,62 @@ function LoginForm() {
       credentials: "include",
       body: JSON.stringify({
         username: username,
-        password : password
+        password: password
       })
     });
+
     if (response.ok) {
-          const res = await fetch("http://localhost:5000/User/whoami", {
-          credentials: "include"
-          });
-          const data = await res.json(); // parse JSON
-          setUser(data);
-          console.log("Username:", data.username); 
-          navigate("/dashboard"); 
+      const res = await fetch("http://localhost:5000/User/whoami", {
+        credentials: "include"
+      });
+
+      const data = await res.json();
+      setUser(data);
+      navigate("/dashboard");
     } else {
-          alert("Login failed");
-      }
-
-
+      setMessage("Login failed");
+    }
   };
 
   return (
-  <div class="  vh-100 d-flex justify-content-center align-items-center position-relative">
-     <video autoPlay loop muted className="bg-video">
-        <source src="/background.mp4" type="video/mp4"/>
+    <div className="vh-100 d-flex justify-content-center align-items-center position-relative">
+      <video autoPlay loop muted className="bg-video">
+        <source src="/background.mp4" type="video/mp4" />
       </video>
-    <div class="glass-card d-flex p-4 justify-content-center align-items-center " style={{width:"350px",height:"400px"}}>
-      
-        <center>  
-      <h2 class="fw-bold mb-4" >Log In</h2>
 
-      <form onSubmit={handleSubmit}>
-        
+      <div className="glass-card d-flex p-4 justify-content-center align-items-center" style={{ width: "350px", height: "400px" }}>
+        <center>
+          <h2 className="fw-bold mb-4">Log In</h2>
 
-        <div class="mb-3">
-          <input
-            class="glass-input form-control-sm"
-            type="email"
-            placeholder="Email"
-            value={username}
-            onChange={e =>  setUsername(e.target.value)}
-          />
-        </div>
-        <div class="mb-3">
-          <input
-            class="glass-input form-control-sm"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-        </div>
-        
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <input
+                className="glass-input form-control-sm"
+                type="email"
+                placeholder="Email"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
 
-        <button className="glass-btn" type="submit">Log In</button>
-      </form>
+            <div className="mb-3">
+              <input
+                className="glass-input form-control-sm"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-      {message && <p>{message}</p>}
-      </center>
-      
+            <button className="glass-btn" type="submit">Log In</button>
+          </form>
+
+          {message && <p className="mt-3 text-white">{message}</p>}
+        </center>
+      </div>
     </div>
-  </div>
   );
 }
 
 export default LoginForm;
-
-
