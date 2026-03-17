@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Import pages
 import Register from "./Pages/RegisterForm";
-import RealTimeData from "./Pages/RealTimeData";
 import Login from "./Pages/Login";
 import AddUnit from "./Pages/AddUnit";
 import AddProperty from "./Pages/AddProperty";
@@ -24,7 +23,6 @@ function App() {
 
           <Route path="/addunit" element={<PrivateRoute><AddUnit /></PrivateRoute>} />
           <Route path="/addproperty" element={<PrivateRoute><AddProperty /></PrivateRoute>} />
-          <Route path="/realtimedata" element={<PrivateRoute><RealTimeData /></PrivateRoute>} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/unitdashboard/:id" element={<PrivateRoute><UnitDashboard /></PrivateRoute>} />
           <Route path="/alerts" element={<PrivateRoute><Alerts /></PrivateRoute>} />

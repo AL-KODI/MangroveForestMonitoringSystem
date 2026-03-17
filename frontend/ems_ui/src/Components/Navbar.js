@@ -77,7 +77,7 @@ const Navbar = () => {
             href="/dashboard"
             style={{ color: "white", textDecoration: "none" }}
           >
-            <h1 className="glow-green mb-0">EMS - Environment monitoring System</h1>
+            <h1 className="glow-green mb-0">EMS</h1>
           </a>
 
           <button

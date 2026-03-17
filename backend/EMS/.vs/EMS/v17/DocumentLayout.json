@@ -3,7 +3,14 @@
   "WorkspaceRootPath": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.AspNetUsers.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.Properties.sql||{0058A1F7-65F3-4DB9-B3D0-CA7E64DD73CD}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B2086EE0-8D50-4F07-BEF7-B09D8D782705}|EMS.csproj|d:\\univ\\year 4\\project\\mangroveforestmonitoringsystem\\backend\\ems\\migrations\\20260315195756_addalerts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2086EE0-8D50-4F07-BEF7-B09D8D782705}|EMS.csproj|solutionrelative:migrations\\20260315195756_addalerts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B2086EE0-8D50-4F07-BEF7-B09D8D782705}|EMS.csproj|d:\\univ\\year 4\\project\\mangroveforestmonitoringsystem\\backend\\ems\\migrations\\20260315104008_a.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -74,10 +81,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{B2086EE0-8D50-4F07-BEF7-B09D8D782705}|EMS.csproj|d:\\univ\\year 4\\project\\mangroveforestmonitoringsystem\\backend\\ems\\dto\\addunitdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B2086EE0-8D50-4F07-BEF7-B09D8D782705}|EMS.csproj|solutionrelative:dto\\addunitdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B2086EE0-8D50-4F07-BEF7-B09D8D782705}|EMS.csproj|d:\\univ\\year 4\\project\\mangroveforestmonitoringsystem\\backend\\ems\\migrations\\20260315195756_addalerts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B2086EE0-8D50-4F07-BEF7-B09D8D782705}|EMS.csproj|solutionrelative:migrations\\20260315195756_addalerts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -92,15 +95,26 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "dbo.Properties.sql",
-              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.Properties.sql",
-              "ToolTip": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.Properties.sql",
+              "Title": "dbo.AspNetUsers [Data]",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.AspNetUsers.sql",
+              "ToolTip": "dbo.AspNetUsers [Data]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2026-03-15T20:06:55.457Z"
+              "WhenOpened": "2026-03-17T05:24:54.248Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 1,
+              "Title": "dbo.Properties [Data]",
+              "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.Properties.sql",
+              "ToolTip": "dbo.Properties [Data]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2026-03-17T05:13:33.195Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "20260315195756_AddAlerts.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Migrations\\20260315195756_AddAlerts.cs",
               "RelativeDocumentMoniker": "Migrations\\20260315195756_AddAlerts.cs",
@@ -108,11 +122,12 @@
               "RelativeToolTip": "Migrations\\20260315195756_AddAlerts.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-15T19:57:56.492Z"
+              "WhenOpened": "2026-03-15T19:57:56.492Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "20260315104008_A.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Migrations\\20260315104008_A.cs",
               "RelativeDocumentMoniker": "Migrations\\20260315104008_A.cs",
@@ -124,7 +139,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "launchSettings.json",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "Properties\\launchSettings.json",
@@ -136,7 +151,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 9,
               "Title": "DataHub.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Hubs\\DataHub.cs",
               "RelativeDocumentMoniker": "Hubs\\DataHub.cs",
@@ -148,7 +163,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -160,7 +175,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 14,
               "Title": "dbo.Units.sql",
               "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.Units.sql",
               "ToolTip": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.Units.sql",
@@ -169,7 +184,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 13,
               "Title": "dbo.UnitProperties.sql",
               "DocumentMoniker": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.UnitProperties.sql",
               "ToolTip": "ViewDataWindow_MSSQL__/_localdb__MSSQLLocalDB/EMS_Db/True/SqlTable/dbo.UnitProperties.sql",
@@ -178,7 +193,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 12,
               "Title": "StoreMeasurementsDto.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\DTO\\StoreMeasurementsDto.cs",
               "RelativeDocumentMoniker": "DTO\\StoreMeasurementsDto.cs",
@@ -190,7 +205,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "GetMeasurementsDto.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\DTO\\GetMeasurementsDto.cs",
               "RelativeDocumentMoniker": "DTO\\GetMeasurementsDto.cs",
@@ -202,7 +217,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 10,
               "Title": "GettingUnitPropertiesDto.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\DTO\\GettingUnitPropertiesDto.cs",
               "RelativeDocumentMoniker": "DTO\\GettingUnitPropertiesDto.cs",
@@ -214,7 +229,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 18,
               "Title": "UnitProperty.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Entities\\UnitProperty.cs",
               "RelativeDocumentMoniker": "Entities\\UnitProperty.cs",
@@ -226,7 +241,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 20,
               "Title": "AddUnitDto.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\DTO\\AddUnitDto.cs",
               "RelativeDocumentMoniker": "DTO\\AddUnitDto.cs",
@@ -238,7 +253,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 16,
               "Title": "AppDbContext.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Data\\AppDbContext.cs",
               "RelativeDocumentMoniker": "Data\\AppDbContext.cs",
@@ -250,7 +265,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 19,
               "Title": "Unit.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Entities\\Unit.cs",
               "RelativeDocumentMoniker": "Entities\\Unit.cs",
@@ -262,7 +277,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 8,
               "Title": "UserController.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Controllers\\UserController.cs",
               "RelativeDocumentMoniker": "Controllers\\UserController.cs",
@@ -274,7 +289,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 17,
               "Title": "Measurement.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Entities\\Measurement.cs",
               "RelativeDocumentMoniker": "Entities\\Measurement.cs",
@@ -286,7 +301,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 15,
               "Title": "AddPropertyDto.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\DTO\\AddPropertyDto.cs",
               "RelativeDocumentMoniker": "DTO\\AddPropertyDto.cs",
@@ -298,7 +313,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "Property.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Entities\\Property.cs",
               "RelativeDocumentMoniker": "Entities\\Property.cs",
@@ -310,7 +325,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "DataController.cs",
               "DocumentMoniker": "D:\\univ\\Year 4\\Project\\MangroveForestMonitoringSystem\\backend\\EMS\\Controllers\\DataController.cs",
               "RelativeDocumentMoniker": "Controllers\\DataController.cs",
