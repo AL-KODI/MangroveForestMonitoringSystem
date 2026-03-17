@@ -65,6 +65,25 @@ Notifications are displayed in the dashboard
 This system aims to enhance the understanding and monitoring of mangrove forests in ecosystems that are hard to access, leveraging modern technology.
 
 ## Contact Info
+Name:Aruna Lakmal
+Registration Number: 2021/CSC/033
+Email: lakmalarunascc@gmail.com
+Contribution: Project Lead — Hardware design and embedded software, Backend Development
+
+Name: Pasan Nevinda
+Registration Number: 2021/CSC/062
+Email: wapasannewinda@gmail.com
+Contribution: Backend development
+
+Name: Damayanthi Wijesinghe
+Registration Number: 2021/CSC/029
+Email: diyamanthiwijeshinghe@gmail.com
+Contribution: Frontend development
+
+Name: Pabasara Samarakoon
+Registration Number: 2021/CSC/050
+Email: pabasara96samarakoon@gmail.com
+Contribution: Frontend development 
 
 ## License
 This project is licensed under the MIT License.
